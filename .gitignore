@@ -12,3 +12,5 @@ embeddings/
 logs
 ..gitignore.un~
 .gitignore~
+.ipy*/
+/annotations/pro*
