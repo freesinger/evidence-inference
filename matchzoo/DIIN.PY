@@ -5,10 +5,12 @@ import matchzoo as mz
 import numpy as np
 from sklearn.model_selection import train_test_split
 
+print(mz.__version__)
+os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 
-# nltk.set_proxy('SYSTEM PROXY')
 import nltk
 nltk.download('punkt')
+# nltk.set_proxy('SYSTEM PROXY')
 
 TYPE = 'classification'
 
@@ -84,11 +86,11 @@ df = pd.DataFrame(data={
 
 """ Split data pack into train/valid """
 train, valid = train_test_split(df, test_size=0.2)
-train_pack = mz.pack(train, task=TYPE)
-valid_pack = mz.pack(valid, task=TYPE)
+train_pack = mz.pack(train, task=classification_task)
+valid_pack = mz.pack(valid, task=classification_task)
 train_pack.frame().head(10) # DataFrame
 
-dp = mz.pack(df, task=TYPE)
+dp = mz.pack(df, task=classification_task)
 print(type(dp.frame))
 frame_slice = dp.frame[0:5]
 print(list(frame_slice.columns))
@@ -97,28 +99,46 @@ assert len(full_frame) == len(dp)
 
 
 """ MODEL & Train """
-preprocessor = mz.models.DIIN.get_default_preprocessor()
+preprocessor = mz.models.DIIN.get_default_preprocessor(
+    truncated_length_left=30,
+    truncated_length_right=30,
+    ngram_size=1
+)
 train_processed = preprocessor.fit_transform(train_pack)
 valid_processed = preprocessor.transform(valid_pack)
 
-ngram_callback = mz.dataloader.callbacks.Ngram(preprocessor, mode='onehot')
+print(preprocessor.context)
+
+# glove_embedding = mz.datasets.embeddings.load_glove_embedding(dimension=100)
+# term_index = preprocessor.context['vocab_unit'].state['term_index']
+# embedding_matrix = glove_embedding.build_matrix(term_index)
+# l2_norm = np.sqrt((embedding_matrix * embedding_matrix).sum(axis=1))
+# embedding_matrix = embedding_matrix / l2_norm[:, np.newaxis]
+
+ngram_callback = mz.dataloader.callbacks.Ngram(preprocessor, mode='index')
 
 trainset = mz.dataloader.Dataset(
     data_pack=train_processed,
     mode='pair',
-    batch_size=32,
+    batch_size=16,
+    num_dup=1,
+    num_neg=4,
+    resample=True,
     callbacks=[ngram_callback]
-    # num_dup=1,
-    # num_neg=4
 )
 validset = mz.dataloader.Dataset(
     data_pack=valid_processed,
     mode='point',
-    batch_size=32,
+    batch_size=16,
+    resample=False,
     callbacks=[ngram_callback]
 )
 
-padding_callback = mz.models.DIIN.get_default_padding_callback()
+padding_callback = mz.models.DIIN.get_default_padding_callback(
+    fixed_length_left=30,
+    fixed_length_right=30, 
+    fixed_ngram_length=15
+)
 
 trainloader = mz.dataloader.DataLoader(
     dataset=trainset,
@@ -133,10 +153,15 @@ validloader = mz.dataloader.DataLoader(
 
 model = mz.models.DIIN()
 model.params['task'] = classification_task
+# model.params['embedding'] = embedding_matrix
 model.params['embedding_output_dim'] = 100
 model.params['embedding_input_dim'] = preprocessor.context['embedding_input_dim']
+model.params['dropout_rate'] = 0.2
 model.guess_and_fill_missing_params()
 model.build()
+
+print(model)
+print('Trainable params: ', sum(p.numel() for p in model.parameters() if p.requires_grad))
 
 optimizer = torch.optim.Adam(model.parameters())
 

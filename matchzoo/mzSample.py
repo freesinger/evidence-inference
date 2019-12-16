@@ -22,23 +22,23 @@ trainset = mz.dataloader.Dataset(
     data_pack=train_processed,
     mode='pair',
     num_dup=1,
+    batch_size=32,
     num_neg=4
 )
 validset = mz.dataloader.Dataset(
     data_pack=valid_processed,
+    batch_size=32,
     mode='point'
 )
 padding_callback = mz.models.ArcI.get_default_padding_callback()
 
 trainloader = mz.dataloader.DataLoader(
     dataset=trainset,
-    batch_size=32,
     stage='train',
     callback=padding_callback
 )
 validloader = mz.dataloader.DataLoader(
     dataset=validset,
-    batch_size=32,
     stage='dev',
     callback=padding_callback
 )
