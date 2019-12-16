@@ -15,3 +15,5 @@ logs
 .ipy*/
 /annotations/pro*
 .vscode/
+*save/
+*.pt
