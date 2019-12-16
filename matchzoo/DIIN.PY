@@ -5,7 +5,7 @@ import matchzoo as mz
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-print(mz.__version__)
+print('MatchZoo version: ', mz.__version__)
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 
 import nltk
@@ -22,7 +22,7 @@ classification_task.metrics = ['acc']
 # print(classification_task)
 
 annot = pd.read_csv('../annotations/annotations_merged.csv')
-print(annot.dtypes)
+# print(annot.dtypes)
 annot.sort_values('PMCID').head(10)
 
 """Process txt file for Articles input"""
@@ -50,13 +50,13 @@ for file in os.listdir(TAR_PATH):
 
 """Prompts Map"""
 right_prompts = [list(pair) for pair in zip(annot['PromptID'].values, annot['Annotations'].values)]
-print(right_prompts[0:5])
+# print(right_prompts[0:5])
 
 """Articles <-> Prompts Map"""
 article_prompt_relations = [list(triplet) for triplet in zip(annot['PMCID'].values, 
                                                              annot['PromptID'].values, 
                                                              annot['Label Code'].values)]
-print(article_prompt_relations[0:5])
+# print(article_prompt_relations[0:5])
 
 """Create Data-pack"""
 left = pd.DataFrame(left_articles, columns=['id_left', 'text_left'])
@@ -77,11 +77,11 @@ text_left = [read_article(str(id)) for id in annot['PMCID']]
 # print(text_left[0:5])
 
 df = pd.DataFrame(data={
-    'id_left': annot['PMCID'].astype(str),
+    'id_left': annot['PMCID'],
     'text_left': text_left,
-    'id_right': annot['PromptID'].astype(str),
-    'text_right': annot['Annotations'].astype(str),
-    'label': annot['Label Code']
+    'id_right': annot['PromptID'],
+    'text_right': annot['Annotations'],
+    'label': annot['Label Code']+1
 })
 
 """ Split data pack into train/valid """
@@ -91,18 +91,18 @@ valid_pack = mz.pack(valid, task=classification_task)
 train_pack.frame().head(10) # DataFrame
 
 dp = mz.pack(df, task=classification_task)
-print(type(dp.frame))
+# print(type(dp.frame))
 frame_slice = dp.frame[0:5]
-print(list(frame_slice.columns))
+# print(list(frame_slice.columns))
 full_frame = dp.frame()
 assert len(full_frame) == len(dp)
 
 
 """ MODEL & Train """
 preprocessor = mz.models.DIIN.get_default_preprocessor(
-    truncated_length_left=30,
-    truncated_length_right=30,
-    ngram_size=1
+    # truncated_length_left=30,
+    # truncated_length_right=30,
+    # ngram_size=1
 )
 train_processed = preprocessor.fit_transform(train_pack)
 valid_processed = preprocessor.transform(valid_pack)
@@ -135,9 +135,9 @@ validset = mz.dataloader.Dataset(
 )
 
 padding_callback = mz.models.DIIN.get_default_padding_callback(
-    fixed_length_left=30,
-    fixed_length_right=30, 
-    fixed_ngram_length=15
+    # fixed_length_left=30,
+    # fixed_length_right=30, 
+    # fixed_ngram_length=15
 )
 
 trainloader = mz.dataloader.DataLoader(
@@ -156,6 +156,7 @@ model.params['task'] = classification_task
 # model.params['embedding'] = embedding_matrix
 model.params['embedding_output_dim'] = 100
 model.params['embedding_input_dim'] = preprocessor.context['embedding_input_dim']
+# model.params['char_embedding_input_dim'] = preprocessor.context['ngram_vocab_size']
 model.params['dropout_rate'] = 0.2
 model.guess_and_fill_missing_params()
 model.build()

@@ -8,7 +8,7 @@ __pycache__/
 /venv/
 # excluded because of size
 embeddings/
-*.log
+# *.log
 logs
 ..gitignore.un~
 .gitignore~

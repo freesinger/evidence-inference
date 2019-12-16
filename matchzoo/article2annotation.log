@@ -1,0 +1,201 @@
+MatchZoo version:  1.1.1
+{'ngram_process_unit': <matchzoo.preprocessors.units.ngram_letter.NgramLetter object at 0x7f3e5114ad50>, 'filter_unit': <matchzoo.preprocessors.units.frequency_filter.FrequencyFilter object at 0x7f3e5186b310>, 'vocab_unit': <matchzoo.preprocessors.units.vocabulary.Vocabulary object at 0x7f3e29e8c890>, 'vocab_size': 103792, 'embedding_input_dim': 103792, 'ngram_vocab_unit': <matchzoo.preprocessors.units.vocabulary.Vocabulary object at 0x7f3e52800750>, 'ngram_vocab_size': 119}
+DIIN(
+  (embedding): Embedding(103792, 100, padding_idx=0)
+  (char_embedding): CharacterEmbedding(
+    (char_embedding): Embedding(100, 8)
+    (conv): Conv1d(8, 100, kernel_size=(5,), stride=(1,))
+  )
+  (exact_maching): Matching()
+  (left_encoder): SemanticComposite(
+    (att_linear): Linear(in_features=603, out_features=1, bias=False)
+    (z_gate): Linear(in_features=402, out_features=201, bias=True)
+    (r_gate): Linear(in_features=402, out_features=201, bias=True)
+    (f_gate): Linear(in_features=402, out_features=201, bias=True)
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (right_encoder): SemanticComposite(
+    (att_linear): Linear(in_features=603, out_features=1, bias=False)
+    (z_gate): Linear(in_features=402, out_features=201, bias=True)
+    (r_gate): Linear(in_features=402, out_features=201, bias=True)
+    (f_gate): Linear(in_features=402, out_features=201, bias=True)
+    (dropout): Dropout(p=0.2, inplace=False)
+  )
+  (matching): Matching()
+  (conv): Conv2d(201, 60, kernel_size=(1, 1), stride=(1, 1))
+  (dense_net): DenseNet(
+    (_dense_blocks): ModuleList(
+      (0): DenseBlock(
+        (_dense_block): ModuleList(
+          (0): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(60, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (1): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(80, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (2): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(100, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (3): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(120, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (4): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(140, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (5): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(160, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (6): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(180, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (7): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(200, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+        )
+      )
+      (1): DenseBlock(
+        (_dense_block): ModuleList(
+          (0): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(110, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (1): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(130, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (2): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(150, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (3): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(170, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (4): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(190, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (5): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(210, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (6): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(230, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (7): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(250, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+        )
+      )
+      (2): DenseBlock(
+        (_dense_block): ModuleList(
+          (0): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(135, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (1): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(155, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (2): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(175, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (3): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(195, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (4): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(215, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (5): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(235, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (6): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(255, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+          (7): Sequential(
+            (0): ConstantPad2d(padding=(0, 2, 0, 2), value=0)
+            (1): Conv2d(275, 20, kernel_size=(3, 3), stride=(1, 1))
+            (2): ReLU()
+          )
+        )
+      )
+    )
+    (_transition_blocks): ModuleList(
+      (0): Sequential(
+        (0): Conv2d(220, 110, kernel_size=(1, 1), stride=(1, 1))
+        (1): MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=0, dilation=1, ceil_mode=False)
+      )
+      (1): Sequential(
+        (0): Conv2d(270, 135, kernel_size=(1, 1), stride=(1, 1))
+        (1): MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=0, dilation=1, ceil_mode=False)
+      )
+      (2): Sequential(
+        (0): Conv2d(295, 147, kernel_size=(1, 1), stride=(1, 1))
+        (1): MaxPool2d(kernel_size=(2, 2), stride=(2, 2), padding=0, dilation=1, ceil_mode=False)
+      )
+    )
+  )
+  (max_pooling): AdaptiveMaxPool2d(output_size=(1, 1))
+  (out_layer): Linear(in_features=147, out_features=3, bias=True)
+  (dropout): Dropout(p=0.2, inplace=False)
+)
+Trainable params:  11730375
+[Iter-414 Loss-0.651]:
+  Validation: accuracy: 0.65
+[Iter-828 Loss-0.368]:
+  Validation: accuracy: 0.7478
+[Iter-1242 Loss-0.222]:
+  Validation: accuracy: 0.78
+[Iter-1656 Loss-0.160]:
+  Validation: accuracy: 0.7833
+[Iter-2070 Loss-0.121]:
+  Validation: accuracy: 0.791
+[Iter-2484 Loss-0.097]:
+  Validation: accuracy: 0.7932
+[Iter-2898 Loss-0.081]:
+  Validation: accuracy: 0.792
+[Iter-3312 Loss-0.075]:
+  Validation: accuracy: 0.7932
+[Iter-3726 Loss-0.070]:
+  Validation: accuracy: 0.7864
+[Iter-4140 Loss-0.060]:
+  Validation: accuracy: 0.791
+Cost time: 1107.345847606659s
