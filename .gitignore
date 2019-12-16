@@ -14,3 +14,4 @@ logs
 .gitignore~
 .ipy*/
 /annotations/pro*
+.vscode/

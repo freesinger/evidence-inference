@@ -4,27 +4,28 @@ import pandas as pd
 import matchzoo as mz
 import numpy as np
 from sklearn.model_selection import train_test_split
-import nltk
 
-#nltk.set_proxy('SYSTEM PROXY')
+
+# nltk.set_proxy('SYSTEM PROXY')
+import nltk
 nltk.download('punkt')
 
 TYPE = 'classification'
 
 classification_task = mz.tasks.Classification(num_classes=3)
 classification_task.metrics = ['acc']
-print(classification_task.num_classes)
-print(classification_task.output_shape)
-print(classification_task.output_dtype)
-print(classification_task)
+# print(classification_task.num_classes)
+# print(classification_task.output_shape)
+# print(classification_task.output_dtype)
+# print(classification_task)
 
-annot = pd.read_csv('./annotations/annotations_merged.csv')
+annot = pd.read_csv('../annotations/annotations_merged.csv')
 print(annot.dtypes)
 annot.sort_values('PMCID').head(10)
 
 """Process txt file for Articles input"""
-TXT_PATH = './annotations/txt_files/'
-TAR_PATH = './annotations/processed_txt_files/'
+TXT_PATH = '../annotations/txt_files/'
+TAR_PATH = '../annotations/processed_txt_files/'
 look_up = {}
 
 if not os.path.exists(TAR_PATH):
@@ -92,7 +93,7 @@ print(type(dp.frame))
 frame_slice = dp.frame[0:5]
 print(list(frame_slice.columns))
 full_frame = dp.frame()
-len(full_frame) == len(dp)
+assert len(full_frame) == len(dp)
 
 
 """ MODEL & Train """
@@ -100,15 +101,21 @@ preprocessor = mz.models.DIIN.get_default_preprocessor()
 train_processed = preprocessor.fit_transform(train_pack)
 valid_processed = preprocessor.transform(valid_pack)
 
+ngram_callback = mz.dataloader.callbacks.Ngram(preprocessor, mode='onehot')
+
 trainset = mz.dataloader.Dataset(
     data_pack=train_processed,
     mode='pair',
-    num_dup=1,
-    num_neg=4
+    batch_size=32,
+    callbacks=[ngram_callback]
+    # num_dup=1,
+    # num_neg=4
 )
 validset = mz.dataloader.Dataset(
     data_pack=valid_processed,
-    mode='point'
+    mode='point',
+    batch_size=32,
+    callbacks=[ngram_callback]
 )
 
 padding_callback = mz.models.DIIN.get_default_padding_callback()
