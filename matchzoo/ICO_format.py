@@ -23,7 +23,7 @@ classification_task.metrics = ['acc']
 
 annot = pd.read_csv('../annotations/annotations_merged.csv')
 # print(annot.dtypes)
-annot.sort_values('PMCID').head(10)
+# annot.sort_values('PMCID').head(10)
 
 
 """Prompt file"""
@@ -31,13 +31,15 @@ prompt = pd.read_csv('../annotations/prompts_merged.csv')
 # print(prompt.dtypes)
 # prompt.sort_values('PMCID').head(10)
 
-"""Concatenate prompt for input"""
-prompt['Prompt'] = [str(triplet)[1:-1] for triplet in zip(prompt['Outcome'].values,
-                                             prompt['Intervention'].values,
-                                             prompt['Comparator'].values)]
-# print(type(prompt['Prompt'][0]), type(prompt['Outcome'][0]))
-# print(prompt['Intervention'][0])
-prompt.head()
+"""Format prompt for input"""
+ICO_format = []
+for triplet in zip(prompt['Intervention'].values, prompt['Comparator'].values, prompt['Outcome'].values):
+    I, C, O = triplet[0], triplet[1], triplet[2]
+    format_ico = 'With respect to ' + O + ', characterize the reported difference between patients receiving ' \
+        + I + ' and those receiving ' + C
+    ICO_format.append(format_ico)
+prompt['Prompt'] = ICO_format
+print(prompt['Prompt'][0])
 
 """Process txt file for Articles input"""
 TXT_PATH = '../annotations/txt_files/'
@@ -114,9 +116,9 @@ assert len(full_frame) == len(dp)
 
 """ MODEL & Train """
 preprocessor = mz.models.DIIN.get_default_preprocessor(
-    # truncated_length_left=30,
-    # truncated_length_right=30,
-    # ngram_size=1
+    truncated_length_left=30,
+    truncated_length_right=30,
+    ngram_size=1
 )
 train_processed = preprocessor.fit_transform(train_pack)
 valid_processed = preprocessor.transform(valid_pack)
