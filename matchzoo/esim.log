@@ -1,0 +1,23 @@
+matchzoo version 1.1.1
+Trainable params:  7891203
+[Iter-221 Loss-0.946]:
+  Validation: accuracy: 0.3823
+[Iter-442 Loss-0.774]:
+  Validation: accuracy: 0.371
+[Iter-663 Loss-0.618]:
+  Validation: accuracy: 0.422
+[Iter-884 Loss-0.497]:
+  Validation: accuracy: 0.4149
+[Iter-1105 Loss-0.423]:
+  Validation: accuracy: 0.4592
+[Iter-1326 Loss-0.362]:
+  Validation: accuracy: 0.4358
+[Iter-1547 Loss-0.306]:
+  Validation: accuracy: 0.4628
+[Iter-1768 Loss-0.267]:
+  Validation: accuracy: 0.4628
+[Iter-1989 Loss-0.239]:
+  Validation: accuracy: 0.472
+[Iter-2210 Loss-0.206]:
+  Validation: accuracy: 0.4648
+Cost time: 179.07752466201782s

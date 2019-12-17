@@ -1,25 +1,14 @@
 import torch
 import os
+import numpy as np
 import pandas as pd
 import matchzoo as mz
-import numpy as np
 from sklearn.model_selection import train_test_split
-
-print('MatchZoo version: ', mz.__version__)
-os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
-
-import nltk
-nltk.download('punkt')
-# nltk.set_proxy('SYSTEM PROXY')
-
-TYPE = 'classification'
+# from transformers import BertConfig, BertModel, BertTokenizer
+print('matchzoo version', mz.__version__)
 
 classification_task = mz.tasks.Classification(num_classes=3)
 classification_task.metrics = ['acc']
-# print(classification_task.num_classes)
-# print(classification_task.output_shape)
-# print(classification_task.output_dtype)
-# print(classification_task)
 
 """Annotation file"""
 annot = pd.read_csv('../annotations/annotations_merged.csv')
@@ -39,7 +28,7 @@ for triplet in zip(prompt['Intervention'].values, prompt['Comparator'].values, p
         + I + ' and those receiving ' + C
     ICO_format.append(format_ico)
 prompt['Prompt'] = ICO_format
-print(prompt['Prompt'][0])
+# print(prompt['Prompt'][0])
 
 """Process txt file for Articles input"""
 TXT_PATH = '../annotations/txt_files/'
@@ -55,34 +44,6 @@ for file in os.listdir(TXT_PATH):
     with open(TXT_PATH+file, 'r', encoding='utf-8') as f, open(TAR_PATH+fname, 'w', encoding='utf-8') as t:
         for line in f.readlines():
             t.write(line.strip())
-
-
-"""Articles Map"""
-left_articles = []
-for file in os.listdir(TAR_PATH):
-    with open(TAR_PATH+file, 'r', encoding='utf-8') as f:
-        left_articles.append([str(file[:-4]), f.readlines()[0]])
-# print(left_articles[0:5])
-
-"""Prompts Map"""
-right_prompts = [list(pair) for pair in zip(annot['PromptID'].values, annot['Annotations'].values)]
-# print(right_prompts[0:5])
-
-"""Articles <-> Prompts Map"""
-article_prompt_relations = [list(triplet) for triplet in zip(annot['PMCID'].values, 
-                                                             annot['PromptID'].values, 
-                                                             annot['Label Code'].values)]
-# print(article_prompt_relations[0:5])
-
-"""Create Data-pack"""
-left = pd.DataFrame(left_articles, columns=['id_left', 'text_left'])
-right = pd.DataFrame(right_prompts, columns=['id_right', 'text_right'])
-relation = pd.DataFrame(article_prompt_relations, columns=['id_left', 'id_right', 'label'])
-dp = mz.DataPack(
-    relation = relation,
-    left = left,
-    right = right
-)
 
 """ Read article by name """
 def read_article(id: str) -> str:
@@ -115,12 +76,12 @@ assert len(full_frame) == len(dp)
 
 
 """ MODEL & Train """
-preprocessor = mz.models.DIIN.get_default_preprocessor(
-    truncated_length_left=30,
-    truncated_length_right=30,
-    ngram_size=1
+preprocessor = mz.models.Bert.get_default_preprocessor(
+    # truncated_length_left=30,
+    # truncated_length_right=30,
+    # ngram_size=1
 )
-train_processed = preprocessor.fit_transform(train_pack)
+train_processed = preprocessor.transform(train_pack)
 valid_processed = preprocessor.transform(valid_pack)
 
 # print(preprocessor.context)
@@ -132,7 +93,7 @@ valid_processed = preprocessor.transform(valid_pack)
 # l2_norm = np.sqrt((embedding_matrix * embedding_matrix).sum(axis=1))
 # embedding_matrix = embedding_matrix / l2_norm[:, np.newaxis]
 
-ngram_callback = mz.dataloader.callbacks.Ngram(preprocessor, mode='index')
+# ngram_callback = mz.dataloader.callbacks.Ngram(preprocessor, mode='index')
 
 trainset = mz.dataloader.Dataset(
     data_pack=train_processed,
@@ -140,19 +101,19 @@ trainset = mz.dataloader.Dataset(
     batch_size=16,
     num_dup=1,
     num_neg=4,
-    resample=True,
-    callbacks=[ngram_callback]
+    resample=True
+    # callbacks=[ngram_callback]
 )
 validset = mz.dataloader.Dataset(
     data_pack=valid_processed,
     mode='point',
     batch_size=16,
-    resample=False,
-    callbacks=[ngram_callback]
+    resample=False
+    # callbacks=[ngram_callback]
 )
 
-padding_callback = mz.models.DIIN.get_default_padding_callback(
-    # fixed_length_left=30,
+padding_callback = mz.models.Bert.get_default_padding_callback(
+    # fixed_length_left=365,
     # fixed_length_right=30, 
     # fixed_ngram_length=15
 )
@@ -168,12 +129,17 @@ validloader = mz.dataloader.DataLoader(
     callback=padding_callback
 )
 
-model = mz.models.DIIN()
+biobert = '/home/sjy1203/Shane/BIOBERT_DIR/biobert'
+model = mz.models.Bert()
 model.params['task'] = classification_task
+model.params['mode'] = biobert
 # model.params['embedding'] = embedding_matrix
-model.params['embedding_output_dim'] = 100
-model.params['embedding_input_dim'] = preprocessor.context['embedding_input_dim']
-model.params['char_embedding_input_dim'] = preprocessor.context['ngram_vocab_size']
+# model.params['mask_value'] = 0
+# model.params['hidden_size'] = 200
+# model.params['lstm_layer'] = 1
+# model.params['embedding_output_dim'] = 100
+# model.params['embedding_input_dim'] = preprocessor.context['embedding_input_dim']
+# model.params['char_embedding_input_dim'] = preprocessor.context['ngram_vocab_size']
 model.params['dropout_rate'] = 0.2
 model.guess_and_fill_missing_params()
 model.build()
