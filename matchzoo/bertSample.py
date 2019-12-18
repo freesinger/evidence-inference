@@ -7,6 +7,9 @@ from sklearn.model_selection import train_test_split
 # from transformers import BertConfig, BertModel, BertTokenizer
 print('matchzoo version', mz.__version__)
 
+"""Not use cuda to debug"""
+# export CUDA_VISIBLE_DEVICES=""
+
 classification_task = mz.tasks.Classification(num_classes=2)
 classification_task.metrics = ['acc']
 
@@ -68,10 +71,12 @@ validloader = mz.dataloader.DataLoader(
     callback=padding_callback
 )
 
-biobert = '/home/sjy1203/Shane/BIOBERT_DIR/biobert'
+biobert = '/home/sjy1203/Shane/BIOBERT_DIR/'
 model = mz.models.Bert()
 model.params['task'] = classification_task
-model.params['mode'] = biobert# 'bert-base-uncased'
+model.params['mode'] = biobert#
+#model.params['mode'] = 'bert-base-uncased'
+
 # model.params['embedding'] = embedding_matrix
 # model.params['mask_value'] = 0
 # model.params['hidden_size'] = 200

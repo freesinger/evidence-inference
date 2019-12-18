@@ -61,7 +61,7 @@ df = pd.DataFrame(data={
     'label': annot['Label Code']+1
 })
 
-""" Split data pack into train/valid """
+"""Split data pack into train/valid"""
 train, valid = train_test_split(df, test_size=0.2)
 train_pack = mz.pack(train, task=classification_task)
 valid_pack = mz.pack(valid, task=classification_task)
@@ -129,7 +129,7 @@ validloader = mz.dataloader.DataLoader(
     callback=padding_callback
 )
 
-biobert = '/home/sjy1203/Shane/BIOBERT_DIR/biobert'
+biobert = '/home/sjy1203/Shane/BIOBERT_DIR/'
 model = mz.models.Bert()
 model.params['task'] = classification_task
 model.params['mode'] = biobert
