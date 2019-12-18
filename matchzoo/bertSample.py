@@ -18,7 +18,9 @@ dev_pack_raw = mz.datasets.wiki_qa.load_data('dev', task=classification_task)
 test_pack_raw = mz.datasets.wiki_qa.load_data('test', task=classification_task)
 
 """ MODEL & Train """
+biobert = '/home/sjy1203/Shane/BIOBERT_DIR/'
 preprocessor = mz.models.Bert.get_default_preprocessor(
+    mode=biobert
     # truncated_length_left=30,
     # truncated_length_right=30,
     # ngram_size=1
@@ -40,7 +42,7 @@ valid_processed = preprocessor.transform(test_pack_raw)
 trainset = mz.dataloader.Dataset(
     data_pack=train_processed,
     mode='point',
-    batch_size=16,
+    batch_size=4,
     # num_dup=1,
     # num_neg=4,
     # resample=True
@@ -49,10 +51,11 @@ trainset = mz.dataloader.Dataset(
 validset = mz.dataloader.Dataset(
     data_pack=valid_processed,
     mode='point',
-    batch_size=16,
+    batch_size=4,
     # resample=False
     # callbacks=[ngram_callback]
 )
+
 
 padding_callback = mz.models.Bert.get_default_padding_callback(
     # fixed_length_left=365,
@@ -71,7 +74,7 @@ validloader = mz.dataloader.DataLoader(
     callback=padding_callback
 )
 
-biobert = '/home/sjy1203/Shane/BIOBERT_DIR/'
+
 model = mz.models.Bert()
 model.params['task'] = classification_task
 model.params['mode'] = biobert#
@@ -88,7 +91,7 @@ model.params['dropout_rate'] = 0.2
 model.guess_and_fill_missing_params()
 model.build()
 
-print(model)
+# print(model)
 print('Trainable params: ', sum(p.numel() for p in model.parameters() if p.requires_grad))
 
 # optimizer = torch.optim.Adam(model.parameters())

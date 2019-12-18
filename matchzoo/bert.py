@@ -7,6 +7,9 @@ from sklearn.model_selection import train_test_split
 # from transformers import BertConfig, BertModel, BertTokenizer
 print('matchzoo version', mz.__version__)
 
+"""Not use cuda to debug"""
+# export CUDA_VISIBLE_DEVICES=""
+
 classification_task = mz.tasks.Classification(num_classes=3)
 classification_task.metrics = ['acc']
 
@@ -46,12 +49,16 @@ for file in os.listdir(TXT_PATH):
             t.write(line.strip())
 
 """ Read article by name """
-def read_article(id: str) -> str:
+def read_article(id):
     with open(TAR_PATH+look_up[id], 'r', encoding='utf-8') as f:
-        return f.readlines()[0]
+        # cut_article = ''
+        # for w in f.readlines()[0].split()[:510]:
+        #     cut_article = cut_article + w + ' '
+        # return cut_article
+        return f.readlines()[0][0:500]
 
 text_left = [read_article(str(id)) for id in annot['PMCID']]
-# print(text_left[0:5])
+print(text_left[0])
 
 df = pd.DataFrame(data={
     'id_left': annot['PMCID'],
@@ -76,11 +83,8 @@ assert len(full_frame) == len(dp)
 
 
 """ MODEL & Train """
-preprocessor = mz.models.Bert.get_default_preprocessor(
-    # truncated_length_left=30,
-    # truncated_length_right=30,
-    # ngram_size=1
-)
+biobert = '/home/sjy1203/Shane/BIOBERT_DIR/'
+preprocessor = mz.models.Bert.get_default_preprocessor(mode=biobert)
 train_processed = preprocessor.transform(train_pack)
 valid_processed = preprocessor.transform(valid_pack)
 
@@ -97,18 +101,18 @@ valid_processed = preprocessor.transform(valid_pack)
 
 trainset = mz.dataloader.Dataset(
     data_pack=train_processed,
-    mode='pair',
-    batch_size=16,
-    num_dup=1,
-    num_neg=4,
-    resample=True
+    mode='point',
+    batch_size=4
+    # num_dup=1,
+    # num_neg=4,
+    # resample=True
     # callbacks=[ngram_callback]
 )
 validset = mz.dataloader.Dataset(
     data_pack=valid_processed,
     mode='point',
-    batch_size=16,
-    resample=False
+    batch_size=4
+    # resample=False
     # callbacks=[ngram_callback]
 )
 
@@ -129,7 +133,7 @@ validloader = mz.dataloader.DataLoader(
     callback=padding_callback
 )
 
-biobert = '/home/sjy1203/Shane/BIOBERT_DIR/'
+
 model = mz.models.Bert()
 model.params['task'] = classification_task
 model.params['mode'] = biobert
@@ -147,11 +151,22 @@ model.build()
 # print(model)
 print('Trainable params: ', sum(p.numel() for p in model.parameters() if p.requires_grad))
 
-optimizer = torch.optim.Adam(model.parameters())
+# optimizer = torch.optim.Adam(model.parameters())
+no_decay = ['bias', 'LayerNorm.weight']
+optimizer_grouped_parameters = [
+    {'params': [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': 5e-5},
+    {'params': [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
+]
+
+from pytorch_transformers import AdamW, WarmupLinearSchedule
+
+optimizer = AdamW(optimizer_grouped_parameters, lr=5e-5, betas=(0.9, 0.98), eps=1e-8)
+scheduler = WarmupLinearSchedule(optimizer, warmup_steps=6, t_total=-1)
 
 trainer = mz.trainers.Trainer(
     model=model,
     optimizer=optimizer,
+    scheduler=scheduler,
     trainloader=trainloader,
     validloader=validloader,
     epochs=10

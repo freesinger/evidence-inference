@@ -1,0 +1,24 @@
+matchzoo version 1.1.1
+TITLE: Influence of dextran-70 on systemic inflammatory response and myocardial ischaemia-reperfusion following cardiac operationsABSTRACT.INTRODUCTION:Experimental studies have demonstrated that dextran-70 reduces the leukocyte–endothelium interaction, but clinical evidence is still lacking. Our objective was to justify the anti-inflammatory effect of dextran-70 following cardiac operations.ABSTRACT.METHODS:Forty patients undergoing coronary bypass surgery (n = 32) or aortic valve replacement (
+Trainable params:  108312579
+[Iter-2022 Loss-1.161]:
+  Validation: accuracy: 0.3629
+[Iter-4044 Loss-1.060]:
+  Validation: accuracy: 0.538
+[Iter-6066 Loss-0.918]:
+  Validation: accuracy: 0.602
+[Iter-8088 Loss-0.767]:
+  Validation: accuracy: 0.6283
+[Iter-10110 Loss-0.609]:
+  Validation: accuracy: 0.6332
+[Iter-12132 Loss-0.483]:
+  Validation: accuracy: 0.622
+[Iter-14154 Loss-0.363]:
+  Validation: accuracy: 0.62
+[Iter-16176 Loss-0.358]:
+  Validation: accuracy: 0.621
+[Iter-18198 Loss-0.360]:
+  Validation: accuracy: 0.62
+[Iter-20220 Loss-0.363]:
+  Validation: accuracy: 0.6229
+Cost time: 2511.9295365810394s
